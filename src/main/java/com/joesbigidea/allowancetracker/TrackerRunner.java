@@ -29,6 +29,8 @@ public class TrackerRunner {
                 staticFileLocation("web-content");
             }
 
+            secure(System.getProperty("configPath") + "/keystore", System.getProperty("keystorePass"), null, null);
+
             get("/hello", (req, res) -> "Hello World");
             get("account/transactions", (req, res) -> accountController.getTransactions(), new JsonTransformer());
             get("account/balance", (req, res) -> accountController.getBalance());

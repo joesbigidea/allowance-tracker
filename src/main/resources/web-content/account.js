@@ -32,3 +32,14 @@
           xhttp.open("GET", "account/transactions", true);
           xhttp.send();
     }
+
+    function processLogin(userId, accessToken, successfulCallback) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                successfulCallback();
+            }
+        };
+        xhttp.open("POST", "fblogin", true);
+        xhttp.send(JSON.stringify({'userId' : userId, "accessToken" : accessToken}));
+    }

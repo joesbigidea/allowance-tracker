@@ -5,7 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import spark.Request;
-import spark.Response;
+import spark.Session;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,7 +18,10 @@ import static spark.Spark.halt;
  * Created by joe on 2/16/16.
  */
 public class FBIntegrationHandler {
-    public Object processFbLogin(String accessToken) {
+    public Object processFbLogin(Request req) {
+        Map<String, String> fbInfo = new Gson().fromJson(req.body(), Map.class);
+        String accessToken = fbInfo.get("accessToken");
+
         try {
             HttpResponse<String> fbResponse = Unirest.get("https://graph.facebook.com/me")
                     .queryString("access_token", accessToken)
@@ -26,6 +29,14 @@ public class FBIntegrationHandler {
             Map<Object, Object> fbmap = new Gson().fromJson(fbResponse.getBody(), Map.class);
             fbmap.entrySet().forEach(e -> System.out.println("FB: " + e.getKey() + e.getValue()));
             System.out.println("ID FROM FB: " + fbmap);
+
+            //make sure there's not already a session to avoid session hijacking
+            if (req.session(false) == null) {
+                Session session = req.session();
+                session.attribute("userId", fbmap.get("id"));
+                session.attribute("name", fbmap.get("name"));
+                System.out.println("Created session");
+            }
         } catch (UnirestException e) {
             e.printStackTrace();
             halt(501);
@@ -34,7 +45,17 @@ public class FBIntegrationHandler {
         return "";
     }
 
-    public String obtainAppSecretProof(String accessToken, String appSecret) {
+    public boolean isLoggedIn(Request req) {
+        Session session = req.session(false);
+        if (session != null) {
+            String userId = session.attribute("userId");
+            return userId != null && !userId.isEmpty();
+        }
+
+        return false;
+    }
+
+    private String obtainAppSecretProof(String accessToken, String appSecret) {
 
         try {
             byte[] key = appSecret.getBytes(Charset.forName("UTF-8"));
@@ -58,7 +79,7 @@ public class FBIntegrationHandler {
      * @return Hex-encoded {@code byte[]}
      * @throws NullPointerException If {@code data} is {@code null}.
      */
-    public byte[] encodeHex(final byte[] data) {
+    private byte[] encodeHex(final byte[] data) {
         if (data == null)
             throw new NullPointerException("Parameter 'data' cannot be null.");
 

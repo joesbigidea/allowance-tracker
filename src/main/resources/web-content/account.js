@@ -33,7 +33,7 @@
           xhttp.send();
     }
 
-    function processLogin(userId, accessToken, successfulCallback) {
+    function processLogin(accessToken, successfulCallback) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -41,5 +41,5 @@
             }
         };
         xhttp.open("POST", "fblogin", true);
-        xhttp.send(JSON.stringify({'userId' : userId, "accessToken" : accessToken}));
+        xhttp.send(JSON.stringify({"accessToken" : accessToken}));
     }

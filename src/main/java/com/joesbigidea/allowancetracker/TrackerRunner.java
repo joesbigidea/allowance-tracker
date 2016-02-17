@@ -45,11 +45,17 @@ public class TrackerRunner {
 
             secure(System.getProperty("configPath") + "/keystore", System.getProperty("keystorePass"), null, null);
 
-            get("/hello", (req, res) -> "Hello World");
-            get("account/transactions", (req, res) -> accountController.getTransactions(), new JsonTransformer());
-            get("account/balance", (req, res) -> accountController.getBalance());
-            post("account/transactions", TrackerRunner::postTransaction, new JsonTransformer());
-            post("fblogin", TrackerRunner::processFbLogin);
+            FBIntegrationHandler fbIntegrationHandler = new FBIntegrationHandler();
+            before((req, res) -> {
+                if (req.pathInfo().contains("authorized") && !fbIntegrationHandler.isLoggedIn(req)) {
+                    res.redirect("/login.html");
+                }
+            });
+
+            get("authorized/account/transactions", (req, res) -> accountController.getTransactions(), new JsonTransformer());
+            get("authorized/account/balance", (req, res) -> accountController.getBalance());
+            post("authorized/account/transactions", TrackerRunner::postTransaction, new JsonTransformer());
+            post("fblogin", (req, res) -> fbIntegrationHandler.processFbLogin(req));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,11 +66,5 @@ public class TrackerRunner {
         Transaction newTransaction = new Gson().fromJson(req.body(), Transaction.class);
         newTransaction.setPostedDate(new Date());
         return accountController.addTransaction(newTransaction);
-    }
-
-    public static Object processFbLogin(Request req, Response res) {
-        Map<String, String> fbInfo = new Gson().fromJson(req.body(), Map.class);
-        new FBIntegrationHandler().processFbLogin(fbInfo.get("accessToken"));
-        return "";
     }
 }

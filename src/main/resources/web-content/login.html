@@ -78,11 +78,7 @@
   // successful.  See statusChangeCallback() for when this call is made.
   function enterApp(accessToken) {
     console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      console.dir(response);
-      processLogin(response.id, accessToken, function() {window.location.href = 'view-account.html'});
-    });
+    processLogin(accessToken, function() {window.location.href = 'authorized/view-account.html'});
   }
 </script>
 

@@ -28,10 +28,17 @@
         <td>{{description}}</td>
         <td>{{postedDate}}</td>
         <td>{{amount}}</td>
+        <td><button onclick="deleteRow({{id}}, '{{description}}')">&#10006;</button></td>
     </tr>
 </script>
 
 <script>
+    function deleteRow(id, description) {
+        if (confirm('Are you sure you want to delete this transaction: "' + description + '"')) {
+            deleteTransaction(id,loadAccountData);
+        }
+    }
+
     function balanceUpdated(balance) {
         document.getElementById("balance").innerHTML = balance;
     }
@@ -46,9 +53,11 @@
         document.getElementById('transactionTable').innerHTML = transactionTrs;
     }
 
-    window.onload = function () {
+    function loadAccountData() {
         retrieveBalance(balanceUpdated);
         retrieveTransactions(transactionsUpdated);
-    };
+    }
+
+    window.onload = loadAccountData;
 </script>
 </html>

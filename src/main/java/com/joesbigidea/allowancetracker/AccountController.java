@@ -1,5 +1,8 @@
 package com.joesbigidea.allowancetracker;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -30,7 +33,22 @@ public class AccountController {
     }
 
     public Transaction addTransaction(Transaction t) {
+        Preconditions.checkNotNull(t, "Transaction cannot be null");
+        Preconditions.checkNotNull(t.getAmount(), "Transaction amount cannot be null");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(t.getDescription()), "Transaction description must be provided");
+        Preconditions.checkNotNull(t.getPostedDate(), "Transaction posted date must be provided");
         return PersistenceService.persist(t);
+    }
+
+    public boolean deleteTransaction(long id) {
+        return PersistenceService.applyTransacted(em -> {
+            Transaction transaction = em.find(Transaction.class, id);
+            if (transaction != null) {
+                em.remove(transaction);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void updateAllowanceTransactions() {

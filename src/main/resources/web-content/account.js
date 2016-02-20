@@ -22,6 +22,15 @@
         return false;
     }
 
+    function deleteTransaction(id, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('delete', 'account/transactions/' + id);
+        if (callback) {
+            xhr.onload = callback;
+        }
+        xhr.send();
+    }
+
     function retrieveTransactions(callback) {
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {

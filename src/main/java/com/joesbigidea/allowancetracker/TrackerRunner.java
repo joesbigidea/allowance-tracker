@@ -26,7 +26,7 @@ import java.util.Map;
 import static spark.Spark.*;
 
 /**
- * Created by joe on 2/13/16.
+ * check out restfb
  */
 public class TrackerRunner {
     private static AccountController accountController;
@@ -52,19 +52,35 @@ public class TrackerRunner {
                 }
             });
 
+            post("fblogin", (req, res) -> fbIntegrationHandler.processFbLogin(req));
+
             get("authorized/account/transactions", (req, res) -> accountController.getTransactions(), new JsonTransformer());
             get("authorized/account/balance", (req, res) -> accountController.getBalance());
             post("authorized/account/transactions", TrackerRunner::postTransaction, new JsonTransformer());
-            post("fblogin", (req, res) -> fbIntegrationHandler.processFbLogin(req));
+            delete("authorized/account/transactions/:id", TrackerRunner::deleteTransaction);
+
+            exception(IllegalArgumentException.class, TrackerRunner::handleValidationException);
+            exception(NullPointerException.class, TrackerRunner::handleValidationException);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
+    public static boolean deleteTransaction(Request req, Response res) {
+        String id = req.params(":id");
+        return accountController.deleteTransaction(Long.parseLong(id));
+    }
+
     public static Transaction postTransaction(Request req, Response res) {
         Transaction newTransaction = new Gson().fromJson(req.body(), Transaction.class);
+        newTransaction.setDescription(newTransaction.getDescription().replace("'", ""));
         newTransaction.setPostedDate(new Date());
         return accountController.addTransaction(newTransaction);
+    }
+
+    public static void handleValidationException(Exception e, Request req, Response resp) {
+        resp.status(400);
+        resp.body("Failed validation: " + e.getMessage());
     }
 }

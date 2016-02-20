@@ -45,7 +45,7 @@ p { color: #685206; font-family: 'Helvetica Neue', sans-serif; font-size: 12px; 
 
 
 .form-style-1 {
-    margin:10px auto;
+   // margin:10px auto;
     max-width: 400px;
     padding: 20px 12px 10px 20px;
     font: 13px "Lucida Sans Unicode", "Lucida Grande", sans-serif;

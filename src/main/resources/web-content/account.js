@@ -10,9 +10,9 @@
           xhttp.send();
     }
 
-    function buy(amount, description, callback) {
+    function addTransaction(amount, description, callback) {
         var transaction = {
-                'amount' : -amount,
+                'amount' : amount,
                 'description' : description
             };
         var xhr = new XMLHttpRequest();

@@ -18,7 +18,7 @@
     -ms-user-select:none;
     user-select:none;
     text-decoration: none;
-    line-height: 50px;
+    line-height: 20px;
 }
 .button-link:hover {
     background: #356094;

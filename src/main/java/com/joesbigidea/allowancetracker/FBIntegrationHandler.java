@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Session;
 
@@ -27,15 +28,22 @@ public class FBIntegrationHandler {
                     .queryString("access_token", accessToken)
                     .queryString("appsecret_proof", obtainAppSecretProof(accessToken, System.getProperty("fbappsecret"))).asString();
             Map<Object, Object> fbmap = new Gson().fromJson(fbResponse.getBody(), Map.class);
-            fbmap.entrySet().forEach(e -> System.out.println("FB: " + e.getKey() + e.getValue()));
-            System.out.println("ID FROM FB: " + fbmap);
+            //fbmap.entrySet().forEach(e -> System.out.println("FB: " + e.getKey() + e.getValue()));
+            //System.out.println("ID FROM FB: " + fbmap);
 
             //make sure there's not already a session to avoid session hijacking
             if (req.session(false) == null) {
-                Session session = req.session();
-                session.attribute("userId", fbmap.get("id"));
-                session.attribute("name", fbmap.get("name"));
-                System.out.println("Created session");
+                String userId = (String)fbmap.get("id");
+                String userName = (String)fbmap.get("name");
+                if (TrackerUser.findByFbUserId(userId).isPresent()) {
+                    Session session = req.session();
+                    session.attribute("userId", userId);
+                    session.attribute("name", userName);
+                    LoggerFactory.getLogger(getClass()).info("Created session: " + userName);
+                }
+                else {
+                    throw new IllegalArgumentException("Unknown user: " + userId + " name: " + userName);
+                }
             }
         } catch (UnirestException e) {
             e.printStackTrace();

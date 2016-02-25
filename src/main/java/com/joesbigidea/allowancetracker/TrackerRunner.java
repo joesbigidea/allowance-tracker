@@ -6,6 +6,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
@@ -33,6 +34,8 @@ public class TrackerRunner {
 
     public static void main(String[] args) {
         try {
+            LoggerFactory.getLogger(TrackerRunner.class).info("Starting Account Application");
+
             PersistenceService.init();
             accountController = new AccountController();
 
@@ -63,6 +66,7 @@ public class TrackerRunner {
             exception(NullPointerException.class, TrackerRunner::handleValidationException);
         } catch (Exception e) {
             e.printStackTrace();
+            LoggerFactory.getLogger(TrackerRunner.class).error("Exception in main:", e);
         }
 
     }
@@ -80,6 +84,7 @@ public class TrackerRunner {
     }
 
     public static void handleValidationException(Exception e, Request req, Response resp) {
+        LoggerFactory.getLogger(TrackerRunner.class).error("Validation Error", e);
         resp.status(400);
         resp.body("Failed validation: " + e.getMessage());
     }

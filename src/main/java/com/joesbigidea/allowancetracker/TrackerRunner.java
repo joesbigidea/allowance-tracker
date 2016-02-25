@@ -6,6 +6,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.jboss.logging.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
@@ -47,6 +48,10 @@ public class TrackerRunner {
             }
 
             secure(System.getProperty("configPath") + "/keystore", System.getProperty("keystorePass"), null, null);
+
+            before((req, res) -> {
+                    Logger.getLogger("access").info(req.requestMethod() + " " + req.url() + " " + req.ip());
+            });
 
             FBIntegrationHandler fbIntegrationHandler = new FBIntegrationHandler();
             before((req, res) -> {

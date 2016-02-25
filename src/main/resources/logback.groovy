@@ -59,7 +59,7 @@ else {
             }
         }
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] %logger{10} %msg%n"
+            pattern = "[%d{yyyy-MM-dd HH:mm:ss.SSS}] %msg%n"
         }
     }
 

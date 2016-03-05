@@ -1,29 +1,17 @@
 package com.joesbigidea.allowancetracker;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.jboss.logging.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.util.Base64;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
-import java.util.Map;
+import java.util.Properties;
 
 import static spark.Spark.*;
 
@@ -37,7 +25,12 @@ public class TrackerRunner {
         try {
             LoggerFactory.getLogger(TrackerRunner.class).info("Starting Account Application");
 
-            PersistenceService.init();
+            Properties props = new Properties();
+            try (Reader reader = Files.newBufferedReader(Paths.get(System.getProperty("configPath")),StandardCharsets.UTF_8)) {
+                props.load(reader);
+            }
+            PersistenceService.init(props);
+
             accountController = new AccountController();
 
             String staticLocation = System.getProperty("staticLocation");
@@ -47,13 +40,13 @@ public class TrackerRunner {
                 staticFileLocation("web-content");
             }
 
-            secure(System.getProperty("configPath") + "/keystore", System.getProperty("keystorePass"), null, null);
+            secure(props.getProperty("keystorePath"), props.getProperty("keystorePass"), null, null);
 
             before((req, res) -> {
                     Logger.getLogger("access").info(req.requestMethod() + " " + req.url() + " " + req.ip());
             });
 
-            FBIntegrationHandler fbIntegrationHandler = new FBIntegrationHandler();
+            FBIntegrationHandler fbIntegrationHandler = new FBIntegrationHandler(props.getProperty("fbappsecret"));
             before((req, res) -> {
                 if (req.pathInfo().contains("authorized") && !fbIntegrationHandler.isLoggedIn(req)) {
                     res.redirect("/login.html");

@@ -19,6 +19,12 @@ import static spark.Spark.halt;
  * Created by joe on 2/16/16.
  */
 public class FBIntegrationHandler {
+    private final String fbAppSecret;
+
+    public FBIntegrationHandler(String fbAppSecret) {
+        this.fbAppSecret = fbAppSecret;
+    }
+
     public Object processFbLogin(Request req) {
         Map<String, String> fbInfo = new Gson().fromJson(req.body(), Map.class);
         String accessToken = fbInfo.get("accessToken");
@@ -26,7 +32,7 @@ public class FBIntegrationHandler {
         try {
             HttpResponse<String> fbResponse = Unirest.get("https://graph.facebook.com/me")
                     .queryString("access_token", accessToken)
-                    .queryString("appsecret_proof", obtainAppSecretProof(accessToken, System.getProperty("fbappsecret"))).asString();
+                    .queryString("appsecret_proof", obtainAppSecretProof(accessToken, fbAppSecret)).asString();
             Map<Object, Object> fbmap = new Gson().fromJson(fbResponse.getBody(), Map.class);
             //fbmap.entrySet().forEach(e -> System.out.println("FB: " + e.getKey() + e.getValue()));
             //System.out.println("ID FROM FB: " + fbmap);

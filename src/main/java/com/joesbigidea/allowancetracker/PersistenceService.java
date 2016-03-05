@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,8 @@ import java.util.stream.Collectors;
 public class PersistenceService {
     private static EntityManagerFactory entityManagerFactory;
 
-    public static void init() throws Exception {
-        entityManagerFactory = javax.persistence.Persistence.createEntityManagerFactory( "com.joesbigidea.allowancetracker" );
+    public static void init(Properties props) throws Exception {
+        entityManagerFactory = javax.persistence.Persistence.createEntityManagerFactory( "com.joesbigidea.allowancetracker", props);
     }
 
     public static <T> T apply(Function<EntityManager, T> funk) {

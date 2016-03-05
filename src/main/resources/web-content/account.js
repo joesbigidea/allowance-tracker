@@ -10,6 +10,17 @@
           xhttp.send();
     }
 
+    function getFbAppId(idConsumer) {
+              var xhttp = new XMLHttpRequest();
+              xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    idConsumer(xhttp.responseText);
+                }
+              };
+              xhttp.open("GET", "fbappid", true);
+              xhttp.send();
+    }
+
     function addTransaction(amount, description, callback) {
         var transaction = {
                 'amount' : amount,

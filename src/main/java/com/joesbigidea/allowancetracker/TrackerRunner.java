@@ -59,6 +59,7 @@ public class TrackerRunner {
             get("authorized/account/balance", (req, res) -> accountController.getBalance());
             post("authorized/account/transactions", TrackerRunner::postTransaction, new JsonTransformer());
             delete("authorized/account/transactions/:id", TrackerRunner::deleteTransaction);
+            get("fbappid", (req, res) -> props.getProperty("fbappid"));
 
             exception(IllegalArgumentException.class, TrackerRunner::handleValidationException);
             exception(NullPointerException.class, TrackerRunner::handleValidationException);

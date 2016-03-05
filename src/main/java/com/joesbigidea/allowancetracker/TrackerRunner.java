@@ -23,7 +23,7 @@ public class TrackerRunner {
 
     public static void main(String[] args) {
         try {
-            LoggerFactory.getLogger(TrackerRunner.class).info("Starting Account Application");
+            LoggerFactory.getLogger(TrackerRunner.class).info("Starting AllowanceLock Application");
 
             Properties props = new Properties();
             try (Reader reader = Files.newBufferedReader(Paths.get(System.getProperty("configPath")),StandardCharsets.UTF_8)) {
@@ -40,6 +40,7 @@ public class TrackerRunner {
                 staticFileLocation("web-content");
             }
 
+            port(Integer.parseInt(props.getProperty("port", "4567")));
             secure(props.getProperty("keystorePath"), props.getProperty("keystorePass"), null, null);
 
             before((req, res) -> {
@@ -53,8 +54,11 @@ public class TrackerRunner {
                 }
             });
 
+            get("/", (req, res) -> {
+                res.redirect("authorized/view-account.html");
+                return "";
+            } );
             post("fblogin", (req, res) -> fbIntegrationHandler.processFbLogin(req));
-
             get("authorized/account/transactions", (req, res) -> accountController.getTransactions(), new JsonTransformer());
             get("authorized/account/balance", (req, res) -> accountController.getBalance());
             post("authorized/account/transactions", TrackerRunner::postTransaction, new JsonTransformer());

@@ -3,3 +3,4 @@ target
 .idea
 logs
 docker/libs
+docker/allowance-tracker.tar

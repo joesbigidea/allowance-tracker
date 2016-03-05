@@ -4,5 +4,5 @@ rm -rf libs
 mkdir libs
 cp ../target/dependency/*  libs
 cp ../target/allowance-tracker-1.0.jar libs
-docker build -t allowance-tracker .
+tar -czf allowance-tracker.tar Dockerfile run.sh build.sh libs
 

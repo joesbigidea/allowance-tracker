@@ -41,7 +41,7 @@ public class TrackerRunner {
             }
 
             port(Integer.parseInt(props.getProperty("port", "4567")));
-            secure(props.getProperty("keystorePath"), props.getProperty("keystorePass"), null, null);
+            //secure(props.getProperty("keystorePath"), props.getProperty("keystorePass"), null, null);
 
             before((req, res) -> {
                     Logger.getLogger("access").info(req.requestMethod() + " " + req.url() + " " + req.ip());
